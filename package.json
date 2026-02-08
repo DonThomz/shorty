@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "shorty",
   "version": "1.0.0",
   "description": "URL shortener - monolithic NestJS + React application",
@@ -11,9 +12,20 @@
     "start": "pnpm --filter shorty-backend start:prod",
     "db:migrate": "pnpm --filter shorty-backend exec prisma migrate dev",
     "db:generate": "pnpm --filter shorty-backend exec prisma generate",
-    "db:studio": "pnpm --filter shorty-backend exec prisma studio"
+    "db:studio": "pnpm --filter shorty-backend exec prisma studio",
+    "lint": "pnpm exec eslint backend frontend",
+    "lint:fix": "pnpm exec eslint backend frontend --fix",
+    "format": "pnpm exec prettier --write \"backend/**/*.ts\" \"frontend/**/*.{ts,tsx,css}\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^8.2.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.54.0"
   }
 }

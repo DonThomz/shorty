@@ -8,7 +8,9 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix"
   },
   "dependencies": {
     "class-transformer": "^0.5.1",

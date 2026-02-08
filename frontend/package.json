@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix"
   },
   "dependencies": {
     "react": "^18.2.0",

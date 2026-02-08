@@ -8,7 +8,7 @@ export class ShortenService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly urlValidator: UrlValidatorService,
-    private readonly shortCodeService: ShortCodeService,
+    private readonly shortCodeService: ShortCodeService
   ) {}
 
   /**

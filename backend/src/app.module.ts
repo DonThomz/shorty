@@ -7,4 +7,4 @@ import { RedirectModule } from './redirect/redirect.module';
 @Module({
   imports: [PrismaModule, ShortenModule, RedirectModule],
 })
-export class AppModule { }
+export class AppModule {}

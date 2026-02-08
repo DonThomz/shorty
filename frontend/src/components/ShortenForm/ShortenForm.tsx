@@ -32,9 +32,7 @@ export function ShortenForm({ onSuccess }: ShortenFormProps) {
       const result = await shortenUrl(url);
       onSuccess(result.shortUrl);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to shorten URL. Please try again.'
-      );
+      setError(err instanceof Error ? err.message : 'Failed to shorten URL. Please try again.');
     } finally {
       setLoading(false);
     }
