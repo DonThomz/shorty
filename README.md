@@ -27,6 +27,18 @@ shorty/
 - API and redirect routes are handled by NestJS controllers
 - Single deployment unit: build frontend, run backend
 
+### Choix d'architecture
+
+| Choix | Justification |
+| ----- | -------------- |
+| **Monolithe** | Une seule unité de déploiement, simplification de l'infra et du déploiement. Idéal pour un MVP ou une application à faible/moyenne charge. |
+| **NestJS** | structure modulaire, injection de dépendances, typage TypeScript. Écosystème mature pour APIs REST. |
+| **Services communs** (`common/`) | `UrlValidatorService`, `ShortCodeService`, `RateLimitGuard` sont réutilisables et testables indépendamment. Séparation des responsabilités. |
+| **Base62 pour les codes courts (7 caractères)** | 62^7 ≈ 3,5 milliards de combinaisons. URL-friendly (a-z, A-Z, 0-9), pas de caractères ambigus. Génération aléatoire avec retry en cas de collision. |
+| **Prisma** | ORM type-safe, migrations versionnées, client généré. Connexion PostgreSQL simple et maintenable. |
+| **Frontend servi par NestJS** | En production, pas de CORS à gérer car API et SPA sont sur le même domaine. Un seul serveur à déployer. |
+| **Rate limiting en mémoire** | Suffisant pour une instance unique. Prévoir Redis pour un déploiement multi-instances (voir *Scalability Considerations*). |
+
 ## Tech Stack
 
 | Layer      | Technology        |
@@ -276,11 +288,19 @@ Le rate limiting est appliqué via un **Guard NestJS** (`RateLimitGuard`) sur le
 These are documented for future work; they are **not** implemented in the current codebase:
 
 1. **Rate limiting:** Replace in-memory store with Redis for multi-instance deployments.
-2. **Short code generation:** Consider distributed ID generation (e.g. Snowflake) to reduce collision risk at scale.
 3. **Database:** Add read replicas for redirect traffic; use connection pooling (e.g. PgBouncer).
 4. **Caching:** Cache short code → long URL lookups in Redis for high-traffic redirects.
 5. **Horizontal scaling:** Run multiple NestJS instances behind a load balancer; ensure DB and rate limit store are shared.
 6. **Monitoring:** Add metrics (latency, error rate) and structured logging for production observability.
+
+## Améliorations de sécurité (non implémentées)
+
+Améliorations possibles pour renforcer la sécurité en production :
+
+4. **Logging des événements de sécurité** : Tracker les échecs de validation, les 429 (rate limit), les tentatives d'accès à des codes inexistants pour détecter les abus.
+6. **Audit trail** : Historiser les créations de liens (IP, timestamp, URL) pour analyse forensique en cas d'abus.
+7. **Blocage des domaines malveillants** : Liste noire (malware, phishing) pour refuser de raccourcir certaines URLs connues.
+8. **Limitation des redirections** : Éviter les chaînes de redirections (A → B → C) en détectant les boucles ou les chaînes trop longues.
 
 ## Possible Future Improvements
 
