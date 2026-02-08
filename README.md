@@ -4,7 +4,7 @@ A monolithic URL shortener application built with NestJS (backend) and React (fr
 
 ## Project Overview
 
-Shorty accepts long URLs, generates unique 7-character Base62 short codes, stores the mapping in PostgreSQL, and redirects visitors to the original URL when they use the short link.
+Shorty takes long URLs, generates unique 7-character Base62 short codes, stores the mapping in PostgreSQL, and redirects visitors to the original URL when using the short link.
 
 ## Architecture
 
@@ -23,29 +23,29 @@ shorty/
 ```
 
 **Flow:**
-- Frontend build is served as static files by NestJS
+- The frontend build is served as static files by NestJS
 - API and redirect routes are handled by NestJS controllers
-- Single deployment unit: build frontend, run backend
+- Single deployment unit: build the frontend, run the backend
 
-### Choix d'architecture
+### Architecture Choices
 
-| Choix | Justification |
-| ----- | -------------- |
-| **Monolithe** | Une seule unité de déploiement, simplification de l'infra et du déploiement. Idéal pour un MVP ou une application à faible/moyenne charge. |
-| **NestJS** | structure modulaire, injection de dépendances, typage TypeScript. Écosystème mature pour APIs REST. |
-| **Services communs** (`common/`) | `UrlValidatorService`, `ShortCodeService`, `RateLimitGuard` sont réutilisables et testables indépendamment. Séparation des responsabilités. |
-| **Base62 pour les codes courts (7 caractères)** | 62^7 ≈ 3,5 milliards de combinaisons. URL-friendly (a-z, A-Z, 0-9), pas de caractères ambigus. Génération aléatoire avec retry en cas de collision. |
-| **Prisma** | ORM type-safe, migrations versionnées, client généré. Connexion PostgreSQL simple et maintenable. |
-| **Frontend servi par NestJS** | En production, pas de CORS à gérer car API et SPA sont sur le même domaine. Un seul serveur à déployer. |
-| **Rate limiting en mémoire** | Suffisant pour une instance unique. Prévoir Redis pour un déploiement multi-instances (voir *Scalability Considerations*). |
+| Choice | Justification |
+| ------ | ------------- |
+| **Monolith** | Single deployment unit, simpler infrastructure and deployment. Ideal for MVP or low/medium-traffic apps. |
+| **NestJS** | Modular structure, dependency injection, TypeScript typing. Mature ecosystem for REST APIs. |
+| **Shared Services (`common/`)** | `UrlValidatorService`, `ShortCodeService`, and `RateLimitGuard` are reusable and independently testable. Clean separation of concerns. |
+| **Base62 for short codes (7 chars)** | 62^7 ≈ 3.5 billion combinations. URL-friendly (a-z, A-Z, 0-9), no ambiguous characters. Random generation with collision retries. |
+| **Prisma** | Type-safe ORM, versioned migrations, generated client. Simple, maintainable PostgreSQL connection. |
+| **Frontend served by NestJS** | In production, no CORS issues since API and SPA share a domain. Only one server to deploy. |
+| **In-memory rate limiting** | Sufficient for a single instance. For multi-instance deployment use Redis (see *Scalability Considerations*). |
 
 ## Tech Stack
 
-| Layer      | Technology        |
-| ---------- | ----------------- |
-| Backend    | NestJS, TypeScript |
+| Layer      | Technology              |
+| ---------- | ---------------------- |
+| Backend    | NestJS, TypeScript     |
 | Database   | PostgreSQL, Prisma ORM |
-| Frontend   | React, TypeScript, Vite |
+| Frontend   | React, TypeScript, Vite|
 | Security   | Helmet, validation, rate limiting |
 
 ## How to Run Locally
@@ -64,7 +64,7 @@ Create a database:
 createdb shorty
 ```
 
-Or using psql:
+Or with psql:
 
 ```sql
 CREATE DATABASE shorty;
@@ -72,7 +72,7 @@ CREATE DATABASE shorty;
 
 ### 2. Environment Variables
 
-Copy the example into `backend/` (Prisma reads `.env` from the backend directory):
+Copy the example into the `backend/` directory (Prisma loads `.env` from there):
 
 ```bash
 cp .env.example backend/.env
@@ -86,10 +86,10 @@ PORT=3000
 NODE_ENV=development
 ```
 
-Adjust `USER` and `PASSWORD` to match your PostgreSQL credentials. With Homebrew PostgreSQL, the user is often your Mac username and no password is needed:
+Replace `USER` and `PASSWORD` with your PostgreSQL credentials. With Homebrew PostgreSQL, the username is often your Mac username and no password is needed:
 
 ```
-DATABASE_URL="postgresql://ton_user@localhost:5432/shorty?schema=public"
+DATABASE_URL="postgresql://your_user@localhost:5432/shorty?schema=public"
 ```
 
 ### 3. Install Dependencies
@@ -129,78 +129,78 @@ pnpm start
 
 Open http://localhost:3000.
 
-## Outils de développement
+## Development Tools
 
-Le projet utilise plusieurs outils pour maintenir la qualité du code et des commits.
+This project uses several tools to ensure code and commit quality.
 
 ### ESLint
 
-Linting configuré pour le backend (NestJS/TypeScript) et le frontend (React/TypeScript), avec les règles recommandées, `eslint-config-prettier` pour éviter les conflits avec Prettier, et les plugins React/React Hooks.
+Linting is set up for both backend (NestJS/TypeScript) and frontend (React/TypeScript), with recommended rules, `eslint-config-prettier` to avoid conflicts with Prettier, and React/React Hooks plugins.
 
 ```bash
-pnpm lint          # Vérifier le code
-pnpm lint:fix      # Corriger automatiquement les problèmes
+pnpm lint          # Check code
+pnpm lint:fix      # Automatically fix issues
 ```
 
 ### Prettier
 
-Formatage du code selon `.prettierrc` (semicolons, single quotes, trailing commas ES5, etc.). Appliqué aux fichiers `.ts`, `.tsx`, `.css` et `.json`.
+Code formatting based on `.prettierrc` (semicolons, single quotes, trailing commas for ES5, etc.). Applied to `.ts`, `.tsx`, `.css`, and `.json` files.
 
 ```bash
-pnpm format        # Formater tous les fichiers
+pnpm format        # Format all files
 ```
 
 ### Commitlint
 
-Validation des messages de commit selon les [Conventional Commits](https://www.conventionalcommits.org/). Types autorisés : `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`.
+Validates commit messages using [Conventional Commits](https://www.conventionalcommits.org/). Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`.
 
-Exemple : `feat: add custom short codes`
+Example: `feat: add custom short codes`
 
 ### Husky + lint-staged
 
-- **pre-commit** : exécute `lint-staged` avant chaque commit — ESLint (avec `--fix`) et Prettier sur les fichiers stagés (`.ts`, `.tsx`, `.css`, `.json`).
-- **commit-msg** : exécute `commitlint` pour valider le message de commit.
+- **pre-commit**: runs `lint-staged` before each commit — ESLint (with `--fix`) and Prettier on staged files (`.ts`, `.tsx`, `.css`, `.json`).
+- **commit-msg** : runs `commitlint` to validate the commit message.
 
-Aucune action manuelle requise : les hooks s'exécutent automatiquement lors de `git commit`.
+No manual actions required: hooks are triggered automatically during `git commit`.
 
-### Tests
+### Testing
 
-Le projet dispose d'une suite de tests complète pour le backend (Jest) et le frontend (Vitest + React Testing Library).
+The project includes a full test suite for the backend (Jest) and frontend (Vitest + React Testing Library).
 
 ```bash
-pnpm test          # Exécute tous les tests (backend + frontend)
-pnpm test:watch    # Mode watch, backend uniquement
+pnpm test          # Runs all tests (backend + frontend)
+pnpm test:watch    # Watch mode, backend only
 ```
 
 **Backend (NestJS + Jest)**
 
-- **Services :** `UrlValidatorService`, `ShortCodeService`, `ShortenService`, `RedirectService`
-- **Controllers :** `ShortenController`, `RedirectController`
-- **Guards et filtres :** `RateLimitGuard`, `HttpExceptionFilter`
-- **Couverture :** validation des URLs (vide, longueur, protocoles interdits), génération de codes Base62, collisions, rate limit, gestion des erreurs
+- **Services:** `UrlValidatorService`, `ShortCodeService`, `ShortenService`, `RedirectService`
+- **Controllers:** `ShortenController`, `RedirectController`
+- **Guards & filters:** `RateLimitGuard`, `HttpExceptionFilter`
+- **Coverage:** URL validation (empty, length, invalid protocols), Base62 code generation, collisions, rate limits, error handling
 
 ```bash
-cd backend && pnpm test        # Exécution unique
-cd backend && pnpm test:watch # Mode watch
+cd backend && pnpm test        # Single run
+cd backend && pnpm test:watch # Watch mode
 ```
 
 **Frontend (React + Vitest)**
 
-- **API :** `validateUrl`, `shortenUrl` (succès, erreurs 400/429, réseau)
-- **Composants :** `ShortenForm`, `ShortUrlResult`, `App`
-- **Couverture :** validation côté client, appel API, feedback copie, affichage des erreurs
+- **API:** `validateUrl`, `shortenUrl` (success, 400/429 errors, network)
+- **Components:** `ShortenForm`, `ShortUrlResult`, `App`
+- **Coverage:** client-side validation, API calls, copy feedback, error display
 
 ```bash
-cd frontend && pnpm test:run   # Exécution unique
-cd frontend && pnpm test      # Mode watch
+cd frontend && pnpm test:run   # Single run
+cd frontend && pnpm test      # Watch mode
 ```
 
 ## API Endpoints
 
-| Method | Path           | Description                    |
-| ------ | ----------------- | ------------------------------ |
-| POST   | /api/shorten      | Shorten a URL (rate limited)   |
-| GET    | /:shortCode       | Redirect to original URL (302) |
+| Method | Path           | Description                      |
+| ------ | -------------- | -------------------------------- |
+| POST   | /api/shorten   | Shorten a URL (rate limited)     |
+| GET    | /:shortCode    | Redirect to original URL (302)   |
 
 ### POST /api/shorten
 
@@ -216,98 +216,100 @@ cd frontend && pnpm test      # Mode watch
 
 **Errors:** 400 (validation), 429 (rate limit exceeded)
 
-## Sécurité
+## Security
 
-### Éléments mis en place
+### Security Measures Implemented
 
-#### 1. Validation des URLs
+#### 1. URL Validation
 
-- **Protocoles autorisés :** uniquement `http://` et `https://`
-- **Protocoles rejetés :** `javascript:`, `data:`, `file:`, `ftp:`, etc. (évite XSS, exécution de code, fuites de fichiers locaux)
-- **Prévention des open redirects :** la whitelist de protocoles empêche les redirections vers des cibles malveillantes
-- **Longueur max :** 2048 caractères pour limiter les abus
-- **Implémentation :** `UrlValidatorService` + `class-validator` sur le DTO
+- **Allowed protocols:** Only `http://` and `https://`
+- **Rejected protocols:** `javascript:`, `data:`, `file:`, `ftp:`, etc. (prevents XSS, code execution, local file leaks)
+- **Open redirect prevention:** Protocol whitelist blocks redirects to malicious targets
+- **Max length:** 2048 characters to prevent abuse
+- **Implementation:** `UrlValidatorService` + `class-validator` on the DTO
 
-#### 2. Sanitisation des entrées
+#### 2. Input Sanitization
 
-- **Validation globale :** `ValidationPipe` NestJS avec `class-validator`
-- **`whitelist: true`** — supprime les propriétés non déclarées dans le DTO
-- **`forbidNonWhitelisted: true`** — rejette la requête si des propriétés inconnues sont envoyées (400)
-- **`transform: true`** — cast automatique vers les types du DTO
-- **DTO :** `ShortenDto` avec `@IsString`, `@IsNotEmpty`, `@MaxLength(2048)` sur `url`
+- **Global validation:** NestJS `ValidationPipe` with `class-validator`
+- **`whitelist: true`** — strips properties not declared in DTO
+- **`forbidNonWhitelisted: true`** — rejects requests with unknown properties (400)
+- **`transform: true`** — automatically typecasts values to DTO types
+- **DTO:** `ShortenDto` uses `@IsString`, `@IsNotEmpty`, `@MaxLength(2048)` on `url`
 
-#### 3. En-têtes HTTP de sécurité (Helmet)
+#### 3. HTTP Security Headers (Helmet)
 
-- **X-Content-Type-Options:** `nosniff` — empêche le MIME sniffing
-- **X-Frame-Options:** protection contre le clickjacking
-- **X-XSS-Protection:** protection XSS du navigateur
-- **Strict-Transport-Security** (HSTS) : imposition du HTTPS en production
-- **Autres headers** : configuration Helmet par défaut pour la sécurité HTTP
+- **X-Content-Type-Options:** `nosniff` — prevents MIME sniffing
+- **X-Frame-Options:** clickjacking protection
+- **X-XSS-Protection:** browser XSS protection
+- **Strict-Transport-Security (HSTS):** enforces HTTPS in production
+- **Other headers:** Helmet defaults for HTTP security
 
-#### 4. Gestion des erreurs
+#### 4. Error Handling
 
-- **Filtre global :** `HttpExceptionFilter` appliqué à toute l’application
-- **Messages exposés :** uniquement des messages génériques côté client
-- **Pas de fuite :** pas de stack traces, détails internes ou infos sensibles
-- **Erreurs non gérées :** loguées côté serveur, réponse client : "An unexpected error occurred"
+- **Global filter:** `HttpExceptionFilter` applied to the entire app
+- **Client response:** only generic error messages exposed
+- **No leaks:** no stack traces, internal details, or sensitive data exposed to clients
+- **Unhandled errors:** logged on server, generic "An unexpected error occurred" sent to client
 
-#### 5. Codes HTTP cohérents
+#### 5. Consistent HTTP Codes
 
-- **400** — validation échouée, URL invalide
-- **404** — short code inexistant
-- **429** — rate limit dépassé
+- **400** — validation failed, invalid URL
+- **404** — short code does not exist
+- **429** — rate limit exceeded
 
-### Rate limiting — configuration détaillée
+### Rate Limiting — Detailed Configuration
 
-Le rate limiting est appliqué via un **Guard NestJS** (`RateLimitGuard`) sur le contrôleur `POST /api/shorten`.
+Rate limiting is enforced via a **NestJS Guard** (`RateLimitGuard`) on the `POST /api/shorten` controller.
 
-| Paramètre | Valeur | Description |
-| --------- | ------ | ----------- |
-| **Identifiant** | IP client | Une fenêtre par adresse IP |
-| **Cible** | `POST /api/shorten` uniquement | Le endpoint de création de liens |
-| **Fenêtre** | 60 secondes (1 minute) | Fenêtre glissante |
-| **Limite** | 10 requêtes / fenêtre | Max 10 requêtes par IP par minute |
-| **Algorithme** | Fenêtre glissante | Compteur remis à zéro quand la fenêtre expire |
+| Parameter       | Value                | Description                                      |
+| --------------- | -------------------- | ------------------------------------------------ |
+| **Identifier**  | Client IP            | Each window is per-IP                            |
+| **Target**      | `POST /api/shorten`  | Short link creation endpoint only                |
+| **Window**      | 60 seconds (1 min)   | Sliding window                                   |
+| **Limit**       | 10 requests/window   | Max 10 requests per IP per minute                |
+| **Algorithm**   | Sliding window       | Counter resets when window expires               |
 
-**Comportement :**
+**Behavior:**
 
-- Première requête d’une IP : création d’une entrée `{ count: 1, resetAt: now + 60s }`
-- Requêtes suivantes : incrément du compteur tant que `now < resetAt`
-- Si `count >= 10` : HTTP **429** avec message `"Too many requests. Please try again later."`
-- Si `now > resetAt` : fenêtre expirée → compteur remis à 1, nouvelle fenêtre
+- First request from an IP: create entry `{ count: 1, resetAt: now + 60s }`
+- Next requests: increment counter as long as `now < resetAt`
+- If `count >= 10`: HTTP **429** with `"Too many requests. Please try again later."`
+- If `now > resetAt`: window expired → reset counter to 1, open new window
 
-**Extraction de l’IP :**
+**IP Extraction:**
 
-- Derrière un proxy : utilisation de `X-Forwarded-For` (première IP = client)
-- Sinon : `request.ip` ou `request.socket.remoteAddress`
+- Behind a proxy: uses `X-Forwarded-For` (first IP = client)
+- Otherwise: `request.ip` or `request.socket.remoteAddress`
 
-**Stockage :** en mémoire (`Map<IP, { count, resetAt }>`). Les données sont perdues au redémarrage. Pour un déploiement multi-instances, remplacer par Redis (voir *Scalability Considerations*).
+**Storage:** In-memory (`Map<IP, { count, resetAt }>`). Data is lost on restart. For multi-instance deployment, replace with Redis (see *Scalability Considerations*).
 
 ## Scalability Considerations (Not Implemented)
 
 These are documented for future work; they are **not** implemented in the current codebase:
 
-1. **Rate limiting:** Replace in-memory store with Redis for multi-instance deployments.
-3. **Database:** Add read replicas for redirect traffic; use connection pooling (e.g. PgBouncer).
-4. **Caching:** Cache short code → long URL lookups in Redis for high-traffic redirects.
-5. **Horizontal scaling:** Run multiple NestJS instances behind a load balancer; ensure DB and rate limit store are shared.
-6. **Monitoring:** Add metrics (latency, error rate) and structured logging for production observability.
+1. **Rate limiting:** Use Redis instead of in-memory storage for multi-instance deployments.
+2. **Database:** Add read replicas for redirect traffic; use connection pooling (e.g., PgBouncer).
+3. **Caching:** Cache short code → long URL lookups in Redis for high-traffic redirects.
+4. **Horizontal scaling:** Run multiple NestJS instances behind a load balancer; ensure DB and rate limiter are shared.
+5. **Monitoring:** Add metrics (latency, error rate) and structured logging for production observability.
 
-## Améliorations de sécurité (non implémentées)
+## Security Improvements (Not Implemented)
 
-Améliorations possibles pour renforcer la sécurité en production :
+Potential enhancements for production-grade security:
 
-4. **Logging des événements de sécurité** : Tracker les échecs de validation, les 429 (rate limit), les tentatives d'accès à des codes inexistants pour détecter les abus.
-6. **Audit trail** : Historiser les créations de liens (IP, timestamp, URL) pour analyse forensique en cas d'abus.
-7. **Blocage des domaines malveillants** : Liste noire (malware, phishing) pour refuser de raccourcir certaines URLs connues.
-8. **Limitation des redirections** : Éviter les chaînes de redirections (A → B → C) en détectant les boucles ou les chaînes trop longues.
+1. **Security event logging:** Track validation failures, 429 responses, and attempts to access non-existent codes to detect abuse.
+2. **Audit trail:** Record short link creation events (IP, timestamp, URL) for forensic analysis.
+3. **Malicious domain blocking:** Blacklist known malware/phishing domains to prevent shortening dangerous URLs.
+4. **Redirect limitation:** Prevent redirect chains (A → B → C) by detecting loops or excessive redirect sequences.
+5. **Query parameter stripping:** When redirecting, remove or sanitize query parameters to avoid open redirect via `?url=...` tricks.
+6. **Short code enumeration protection:** Rate limit or throttle redirects on unknown codes to deter brute-force attacks.
 
 ## Possible Future Improvements
 
-- Custom short codes (e.g. `/go/example`)
+- Custom short codes (e.g., `/go/example`)
 - Analytics (click counts, referrers)
-- Expiration for short URLs
-- Authentication for managing own links
+- Expiry for short URLs
+- Authentication to manage personal links
 - Admin UI for viewing/managing shortened URLs
 
 ## License
