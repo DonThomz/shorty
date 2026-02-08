@@ -6,6 +6,7 @@ export default {
       'always',
       ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf', 'ci'],
     ],
-    'header-max-length': [2, 'always', 100],
+    'header-max-length': [2, 'always', 300],
+    'subject-full-stop': [0],
   },
 };
