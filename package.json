@@ -1,0 +1,19 @@
+{
+  "name": "shorty",
+  "version": "1.0.0",
+  "description": "URL shortener - monolithic NestJS + React application",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter shorty-backend start:dev\" \"pnpm --filter shorty-frontend dev\"",
+    "build": "pnpm run build:frontend && pnpm run build:backend",
+    "build:frontend": "pnpm --filter shorty-frontend build",
+    "build:backend": "pnpm --filter shorty-backend build",
+    "start": "pnpm --filter shorty-backend start:prod",
+    "db:migrate": "pnpm --filter shorty-backend exec prisma migrate dev",
+    "db:generate": "pnpm --filter shorty-backend exec prisma generate",
+    "db:studio": "pnpm --filter shorty-backend exec prisma studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
