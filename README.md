@@ -117,6 +117,72 @@ pnpm start
 
 Open http://localhost:3000.
 
+## Outils de développement
+
+Le projet utilise plusieurs outils pour maintenir la qualité du code et des commits.
+
+### ESLint
+
+Linting configuré pour le backend (NestJS/TypeScript) et le frontend (React/TypeScript), avec les règles recommandées, `eslint-config-prettier` pour éviter les conflits avec Prettier, et les plugins React/React Hooks.
+
+```bash
+pnpm lint          # Vérifier le code
+pnpm lint:fix      # Corriger automatiquement les problèmes
+```
+
+### Prettier
+
+Formatage du code selon `.prettierrc` (semicolons, single quotes, trailing commas ES5, etc.). Appliqué aux fichiers `.ts`, `.tsx`, `.css` et `.json`.
+
+```bash
+pnpm format        # Formater tous les fichiers
+```
+
+### Commitlint
+
+Validation des messages de commit selon les [Conventional Commits](https://www.conventionalcommits.org/). Types autorisés : `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`.
+
+Exemple : `feat: add custom short codes`
+
+### Husky + lint-staged
+
+- **pre-commit** : exécute `lint-staged` avant chaque commit — ESLint (avec `--fix`) et Prettier sur les fichiers stagés (`.ts`, `.tsx`, `.css`, `.json`).
+- **commit-msg** : exécute `commitlint` pour valider le message de commit.
+
+Aucune action manuelle requise : les hooks s'exécutent automatiquement lors de `git commit`.
+
+### Tests
+
+Le projet dispose d'une suite de tests complète pour le backend (Jest) et le frontend (Vitest + React Testing Library).
+
+```bash
+pnpm test          # Exécute tous les tests (backend + frontend)
+pnpm test:watch    # Mode watch, backend uniquement
+```
+
+**Backend (NestJS + Jest)**
+
+- **Services :** `UrlValidatorService`, `ShortCodeService`, `ShortenService`, `RedirectService`
+- **Controllers :** `ShortenController`, `RedirectController`
+- **Guards et filtres :** `RateLimitGuard`, `HttpExceptionFilter`
+- **Couverture :** validation des URLs (vide, longueur, protocoles interdits), génération de codes Base62, collisions, rate limit, gestion des erreurs
+
+```bash
+cd backend && pnpm test        # Exécution unique
+cd backend && pnpm test:watch # Mode watch
+```
+
+**Frontend (React + Vitest)**
+
+- **API :** `validateUrl`, `shortenUrl` (succès, erreurs 400/429, réseau)
+- **Composants :** `ShortenForm`, `ShortUrlResult`, `App`
+- **Couverture :** validation côté client, appel API, feedback copie, affichage des erreurs
+
+```bash
+cd frontend && pnpm test:run   # Exécution unique
+cd frontend && pnpm test      # Mode watch
+```
+
 ## API Endpoints
 
 | Method | Path           | Description                    |

@@ -17,7 +17,6 @@ export class RedirectController {
   @Get(':shortCode')
   async redirect(@Param('shortCode') shortCode: string, @Res() res: Response): Promise<void> {
     const longUrl = await this.redirectService.findLongUrl(shortCode);
-    console.log('longUrl', longUrl);
     if (!longUrl) {
       throw new NotFoundException('Short URL not found');
     }

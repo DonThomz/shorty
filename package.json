@@ -6,6 +6,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"pnpm --filter shorty-backend start:dev\" \"pnpm --filter shorty-frontend dev\"",
+    "test": "pnpm --filter shorty-backend test && pnpm --filter shorty-frontend test:run",
+    "test:watch": "pnpm --filter shorty-backend test:watch",
     "build": "pnpm run build:frontend && pnpm run build:backend",
     "build:frontend": "pnpm --filter shorty-frontend build",
     "build:backend": "pnpm --filter shorty-backend build",
