@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-const BASE62_CHARS =
-  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const BASE62_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const SHORT_CODE_LENGTH = 7;
 
 @Injectable()
@@ -31,7 +27,7 @@ export class ShortCodeService {
       }
     }
     throw new InternalServerErrorException(
-      'Failed to generate unique short code. Please try again.',
+      'Failed to generate unique short code. Please try again.'
     );
   }
 

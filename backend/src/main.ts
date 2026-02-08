@@ -25,7 +25,7 @@ async function bootstrap() {
       whitelist: true, // Strip unknown properties
       forbidNonWhitelisted: true, // Reject unknown properties
       transform: true, // Auto-transform payloads to DTO types
-    }),
+    })
   );
 
   // Serve static frontend build (from backend/dist, go up to root then frontend/build)

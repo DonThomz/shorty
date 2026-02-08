@@ -7,7 +7,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { Request } from 'express';
 
 /**
  * Global exception filter - prevents internal error details from leaking to clients.
@@ -47,15 +46,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
           : String(exceptionResponse);
 
       // If array (validation errors), take the first one
-      message = Array.isArray(rawMessage)
-        ? rawMessage[0] || 'Validation failed'
-        : rawMessage;
+      message = Array.isArray(rawMessage) ? rawMessage[0] || 'Validation failed' : rawMessage;
     } else if (exception instanceof Error) {
       // Unhandled error: log internally (with stack trace) without exposing to client
-      this.logger.error(
-        `Unhandled error: ${exception.message}`,
-        exception.stack,
-      );
+      this.logger.error(`Unhandled error: ${exception.message}`, exception.stack);
     }
 
     // Uniform JSON response: always { statusCode, message }

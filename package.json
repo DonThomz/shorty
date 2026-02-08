@@ -1,19 +1,47 @@
 {
+  "type": "module",
   "name": "shorty",
   "version": "1.0.0",
   "description": "URL shortener - monolithic NestJS + React application",
   "private": true,
   "scripts": {
     "dev": "concurrently \"pnpm --filter shorty-backend start:dev\" \"pnpm --filter shorty-frontend dev\"",
+    "test": "pnpm --filter shorty-backend test && pnpm --filter shorty-frontend test:run",
+    "test:watch": "pnpm --filter shorty-backend test:watch",
     "build": "pnpm run build:frontend && pnpm run build:backend",
     "build:frontend": "pnpm --filter shorty-frontend build",
     "build:backend": "pnpm --filter shorty-backend build",
     "start": "pnpm --filter shorty-backend start:prod",
     "db:migrate": "pnpm --filter shorty-backend exec prisma migrate dev",
     "db:generate": "pnpm --filter shorty-backend exec prisma generate",
-    "db:studio": "pnpm --filter shorty-backend exec prisma studio"
+    "db:studio": "pnpm --filter shorty-backend exec prisma studio",
+    "lint": "pnpm exec eslint backend frontend",
+    "lint:fix": "pnpm exec eslint backend frontend --fix",
+    "format": "pnpm exec prettier --write \"backend/**/*.ts\" \"frontend/**/*.{ts,tsx,css}\" \"*.json\" \"**/*.json\"",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^8.2.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.54.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,json}": [
+      "prettier --write"
+    ]
   }
 }

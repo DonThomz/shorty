@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { ShortenService } from './shorten.service';
 import { ShortenDto } from './dto/shorten.dto';
@@ -27,10 +20,7 @@ export class ShortenController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(RateLimitGuard)
-  async shorten(
-    @Body() dto: ShortenDto,
-    @Req() req: Request,
-  ): Promise<{ shortUrl: string }> {
+  async shorten(@Body() dto: ShortenDto, @Req() req: Request): Promise<{ shortUrl: string }> {
     const baseUrl = this.getBaseUrl(req);
     const shortUrl = await this.shortenService.createShortUrl(dto.url, baseUrl);
     return { shortUrl };
